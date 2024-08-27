@@ -6,7 +6,7 @@ import (
 )
 
 type ForecastJSON struct {
-	Latitude       float64
+	Latitude       float64 ""
 	Longitude      float64
 	Elevation      float64
 	GenerationTime float64                    `json:"generationtime_ms"`
