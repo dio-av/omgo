@@ -73,12 +73,12 @@ func urlFromOptions(baseURL string, loc Location, opts *Options) string {
 		url = fmt.Sprintf(`%s&timezone=%s`, url, opts.Timezone)
 	}
 
-	if opts.HourlyMetrics != nil && len(opts.HourlyMetrics) > 0 {
+	if len(opts.HourlyMetrics) > 0 {
 		metrics := strings.Join(opts.HourlyMetrics, ",")
 		url = fmt.Sprintf(`%s&hourly=%s`, url, metrics)
 	}
 
-	if opts.DailyMetrics != nil && len(opts.DailyMetrics) > 0 {
+	if len(opts.DailyMetrics) > 0 {
 		metrics := strings.Join(opts.DailyMetrics, ",")
 		url = fmt.Sprintf(`%s&daily=%s`, url, metrics)
 	}
@@ -98,7 +98,7 @@ func urlFromHistoricalOptions(baseURL string, loc Location, opts *HistoricalOpti
 	}
 
 	// TODO: if end_date is equal or less than end_date return an error
-	url += fmt.Sprintf(`%s&start_date=%s&end_date=%s`, url, opts.StartDate, opts.EndDate)
+	url = fmt.Sprintf(`%s&start_date=%s&end_date=%s`, url, opts.StartDate, opts.EndDate)
 
 	if opts.TemperatureUnit != "" {
 		url = fmt.Sprintf(`%s&temperature_unit=%s`, url, opts.TemperatureUnit)
@@ -113,12 +113,12 @@ func urlFromHistoricalOptions(baseURL string, loc Location, opts *HistoricalOpti
 		url = fmt.Sprintf(`%s&timezone=%s`, url, opts.Timezone)
 	}
 
-	if opts.HourlyMetrics != nil && len(opts.HourlyMetrics) > 0 {
+	if len(opts.HourlyMetrics) > 0 {
 		metrics := strings.Join(opts.HourlyMetrics, ",")
 		url = fmt.Sprintf(`%s&hourly=%s`, url, metrics)
 	}
 
-	if opts.DailyMetrics != nil && len(opts.DailyMetrics) > 0 {
+	if len(opts.DailyMetrics) > 0 {
 		metrics := strings.Join(opts.DailyMetrics, ",")
 		url = fmt.Sprintf(`%s&daily=%s`, url, metrics)
 	}
@@ -152,9 +152,9 @@ func (c Client) Get(ctx context.Context, loc Location, opts *Options) ([]byte, e
 }
 
 func (c *Client) GetHistocial(ctx context.Context, loc Location, opts *HistoricalOptions) ([]byte, error) {
-	c.URL = "https://archive-api.open-meteo.com/v1/archive"
+	URL := "https://archive-api.open-meteo.com/v1/archive"
 
-	url, err := urlFromHistoricalOptions(c.URL, loc, opts)
+	url, err := urlFromHistoricalOptions(URL, loc, opts)
 	if err != nil {
 		return []byte{}, fmt.Errorf("failed to form url from historical options %q", err)
 	}
