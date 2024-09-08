@@ -103,3 +103,98 @@ func TestForecastUnmarshalWithDailyValues(t *testing.T) {
 			time.Date(2021, time.September, 26, 0, 0, 0, 0, time.UTC)},
 		fc.DailyTimes)
 }
+
+func TestHistoricalUnmarshalWithHourlyValues(t *testing.T) {
+	body := []byte(`{
+		"latitude": 52.54833,
+		"longitude": 13.407822,
+		"generationtime_ms": 0.108957290649414,
+		"utc_offset_seconds": 0,
+		"timezone": "GMT",
+		"timezone_abbreviation": "GMT",
+		"elevation": 38,
+		"hourly_units": {
+			"time": "iso8601",
+			"temperature_2m": "°C",
+			"cloud_cover": "%"
+		},
+		"hourly": {
+			"time": [
+			"2024-08-30T00:00",
+			"2024-08-30T01:00",
+			"2024-08-30T02:00",
+			"2024-08-30T03:00",
+			"2024-08-30T04:00",
+			"2024-08-30T05:00",
+			"2024-08-30T06:00",
+			"2024-08-30T07:00",
+			"2024-08-30T08:00",
+			"2024-08-30T09:00",
+			"2024-08-30T10:00",
+			],
+			"temperature_2m": [24.7, 22.8, 21.3, 20.9, 20.1, 20.4, 21.6, 23.2, 23.8],
+			"cloud_cover": [30, 19, 0, 4, 16, 10, 31, 33, 37]
+		}
+	}`)
+
+	fc, err := ParseHistoricalBody(body)
+	require.NoError(t, err)
+	require.Equal(t, []float64{13, 12.7, 12.7}, fc.HourlyMetrics["temperature_2m"])
+	//require.Equal(t, float64(262), fc..WindDirection)
+	require.Equal(t,
+		[]time.Time{
+			time.Date(2024, time.August, 28, 0, 0, 0, 0, time.UTC),
+			time.Date(2024, time.August, 28, 1, 0, 0, 0, time.UTC),
+			time.Date(2024, time.August, 28, 2, 0, 0, 0, time.UTC)},
+		fc.HourlyTimes)
+}
+
+func TestHistoricalUnmarshalWithDailyValues(t *testing.T) {
+	body := []byte(`{
+		"latitude": 52.52,
+		"longitude": 13.419998,
+		"generationtime_ms": 0.0669956207275391,
+		"utc_offset_seconds": 0,
+		"timezone": "GMT",
+		"timezone_abbreviation": "GMT",
+		"elevation": 38,
+		"daily_units": {
+			"time": "iso8601",
+			"temperature_2m_max": "°C",
+			"temperature_2m_min": "°C",
+			"sunrise": "iso8601",
+			"sunset": "iso8601"
+		},
+		"daily": {
+			"time": [
+				"2024-08-30",
+				"2024-08-31"
+			],
+			"temperature_2m_max": [28.3, 23.7],
+			"temperature_2m_min": [16.1, 14.7],
+			"sunrise": [
+				"2024-08-30T04:14",
+				"2024-08-31T04:16"
+			],
+			"sunset": [
+				"2024-08-30T17:58",
+				"2024-08-31T17:56"
+			]
+		}
+	}`)
+
+	fc, err := ParseHistoricalBody(body)
+	require.NoError(t, err)
+	require.Equal(t, []float64{28.3, 23.7}, fc.DailyMetrics["temperature_2m_max"])
+	require.Equal(t, []float64{16.1, 14.7}, fc.DailyMetrics["temperature_2m_min"])
+	require.Equal(t,
+		[]time.Time{
+			time.Date(2024, time.August, 30, 4, 14, 0, 0, time.UTC),
+			time.Date(2024, time.August, 31, 4, 16, 0, 0, time.UTC)},
+		fc.SunTimes["sunrise"])
+	require.Equal(t,
+		[]time.Time{
+			time.Date(2024, time.August, 30, 17, 58, 0, 0, time.UTC),
+			time.Date(2024, time.August, 31, 17, 56, 0, 0, time.UTC)},
+		fc.SunTimes["sunset"])
+}

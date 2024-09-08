@@ -51,8 +51,9 @@ type Historical struct {
 	HourlyMetrics  map[string][]float64 // Parsed from HistoricalJSON.HourlyMetrics
 	HourlyTimes    []time.Time          // Parsed from HistoricalJSON.HourlyMetrics
 	DailyUnits     map[string]string
-	DailyMetrics   map[string][]float64 // Parsed from HistoricalJSON.DailyMetrics
-	DailyTimes     []time.Time          // Parsed from HistoricalJSON.DailyMetrics
+	DailyMetrics   map[string][]float64   // Parsed from HistoricalJSON.DailyMetrics
+	DailyTimes     []time.Time            // Parsed from HistoricalJSON.DailyMetrics
+	SunTimes       map[string][]time.Time // Parsed from HistoricalJSON.DailyMetrics
 }
 
 type CurrentWeather struct {
@@ -62,6 +63,8 @@ type CurrentWeather struct {
 	WindDirection float64
 	WindSpeed     float64
 }
+
+// TODO: Parse sunrise and sunset
 
 // ParseBody converts the API response body into a Forecast struct
 // Rationale: The API returns a map with both times as well as floats, this function
@@ -156,6 +159,7 @@ func ParseHistoricalBody(body []byte) (*Historical, error) {
 		DailyUnits:     f.DailyUnits,
 		DailyTimes:     []time.Time{},
 		DailyMetrics:   make(map[string][]float64),
+		SunTimes:       make(map[string][]time.Time),
 	}
 
 	for k, v := range f.HourlyMetrics {
@@ -171,7 +175,6 @@ func ParseHistoricalBody(body []byte) (*Historical, error) {
 			for _, at := range target {
 				fc.HourlyTimes = append(fc.HourlyTimes, at.Time)
 			}
-
 			continue
 		}
 		target := []float64{}
@@ -197,13 +200,28 @@ func ParseHistoricalBody(body []byte) (*Historical, error) {
 			}
 
 			continue
+		} else if k == "sunrise" || k == "sunset" {
+			target := []ApiDateTime{}
+			err := json.Unmarshal(v, &target)
+			if err != nil {
+				return nil, err
+			}
+
+			var dt []time.Time
+			for _, at := range target {
+				dt = append(dt, at.Time)
+			}
+			fc.SunTimes[k] = dt
+
+			continue
+		} else {
+			target := []float64{}
+			err := json.Unmarshal(v, &target)
+			if err != nil {
+				return nil, err
+			}
+			fc.DailyMetrics[k] = target
 		}
-		target := []float64{}
-		err := json.Unmarshal(v, &target)
-		if err != nil {
-			return nil, err
-		}
-		fc.DailyMetrics[k] = target
 	}
 
 	return fc, nil

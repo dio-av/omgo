@@ -1,6 +1,7 @@
 package omgo
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -8,6 +9,7 @@ import (
 
 const atLayout = "2006-01-02T15:04"
 const adLayout = "2006-01-02"
+const dateTimeApiLayout = "2006-01-02T15:04"
 
 var nilTime = (time.Time{}).UnixNano()
 
@@ -16,6 +18,10 @@ type ApiTime struct {
 }
 
 type ApiDate struct {
+	time.Time
+}
+
+type ApiDateTime struct {
 	time.Time
 }
 
@@ -59,4 +65,27 @@ func (ct *ApiDate) MarshalJSON() ([]byte, error) {
 
 func (ct *ApiDate) IsSet() bool {
 	return ct.UnixNano() != nilTime
+}
+
+func (dt ApiDateTime) MarshalJSON() ([]byte, error) {
+	formatted := dt.Time.Format(dateTimeApiLayout)
+
+	return json.Marshal(formatted)
+}
+
+func (dt *ApiDateTime) UnmarshalJSON(b []byte) error {
+	var s string
+	err := json.Unmarshal(b, &s)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal to a string: %w", err)
+	}
+
+	t, err := time.Parse(dateTimeApiLayout, s)
+	if err != nil {
+		return fmt.Errorf("failed to parse time: %w", err)
+	}
+
+	dt.Time = t
+
+	return nil
 }

@@ -23,7 +23,7 @@ func TestHistorical(t *testing.T) {
 		StartDate:         "2023-05-01",
 		EndDate:           "2023-06-01",
 		HourlyMetrics:     []string{"cloudcover", "relativehumidity_2m"},
-		DailyMetrics:      []string{"temperature_2m_max"},
+		DailyMetrics:      []string{"temperature_2m_max", "sunrise"},
 	}
 
 	res, err := c.Historical(context.Background(), loc, &hopts)
@@ -32,5 +32,5 @@ func TestHistorical(t *testing.T) {
 	require.Greater(t, len(res.HourlyTimes), 0)
 	require.Equal(t, 2, len(res.HourlyMetrics))
 	require.Greater(t, len(res.DailyTimes), 0)
-	require.Equal(t, 1, len(res.DailyMetrics))
+	require.Equal(t, 2, len(res.DailyMetrics))
 }
