@@ -1,10 +1,8 @@
 # Open-Meteo-Go
 
-A simple go client for the [open meteo](https://open-meteo.com) API. It supports all options of the API as of Sept 20 2021.
+A simple go client for the [open meteo](https://open-meteo.com) API. 
 
-This fork will provide and implementation for Historical API, so client can get the past data of Open Meteo.
-
-The implementation will separate one client for the Forecast and another for Historical.
+This fork will provide and implementation for Forecast and Historical API, so the client can get both data of Open Meteo.
 
 ## Usage
 
@@ -56,7 +54,7 @@ func main() {
 		StartDate:         "2023-05-01",
 		EndDate:           "2023-06-01",
 		HourlyMetrics:     []string{"cloudcover, relativehumidity_2m"},
-		DailyMetrics:      []string{"temperature_2m_max"},
+		DailyMetrics:      []string{"temperature_2m_max", "sunset"},
 	}
 
 	hres, _ := f.Historical(context.Background(), loc, &hopts)
