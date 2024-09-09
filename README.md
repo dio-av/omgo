@@ -2,7 +2,7 @@
 
 A simple go client for the [open meteo](https://open-meteo.com) API. 
 
-This fork will provide and implementation for Forecast and Historical API, so the client can get both data of Open Meteo.
+This fork will provide an implementation for Forecast and Historical API, so the client can get both data of Open Meteo.
 
 ## Usage
 
